@@ -43,8 +43,8 @@ matcher = LightGlue(features="superpoint").eval().to(device)
 
 
 # Load images
-image0_load = images_path / "IR_1.jpg"
-image1_load = images_path / "VIS_1.jpg"
+image0_load = images_path / "IR_3.jpg"
+image1_load = images_path / "VIS_3.jpg"
 
 resize_to_smaller(image0_load, image1_load, images_path)
 
@@ -59,7 +59,9 @@ plt.title('Image 0')
 plt.subplot(1, 2, 2)
 plt.imshow(image1.permute(1, 2, 0).cpu().numpy())
 plt.title('Image 1')
+plt.savefig("assets/loaded_images.png")
 plt.show()
+
 
 
 # Extract features from both images
@@ -139,9 +141,12 @@ alpha = 0.5  # blending factor
 blended_image = cv2.addWeighted(warped_img0, alpha, image1_np, 1 - alpha, 0)
 
 # Display the blended image
+
 cv2.imshow('Blended Image', blended_image)
+cv2.imwrite('assets/image_fusion.png', 255*blended_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
 
 # # Create a canvas to hold both images
 # canvas = np.zeros((y_max - y_min, x_max - x_min, 3), dtype=np.uint8)
