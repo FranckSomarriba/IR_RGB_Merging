@@ -32,6 +32,23 @@ def resize_to_smaller(image1_path, image2_path, output_path):
         image1.save(output_path / 'image0_rz.jpg')
         resized_image2.save(output_path / 'image1_rz.jpg')
 
+def transform_grayscale(image_path, output_path):
+    """
+    Creates a grayscale copy of an image
+
+    Parameters:
+    - image_path: Path to the first image file.
+    - output_path: Path to save the resized images.
+    """
+
+    image = Image.open(image_path)
+
+    # Convert the image to grayscale
+    grayscale_image = image.convert("L")
+
+    # Save the grayscale image to the output path
+    grayscale_image.save(output_path / 'image1_gray.jpg')
+
 torch.set_grad_enabled(False)
 
 images_path = Path("assets")
@@ -51,6 +68,7 @@ resize_to_smaller(image0_load, image1_load, images_path)
 image0 = load_image(images_path / "image0_rz.jpg")
 image1 = load_image(images_path / "image1_rz.jpg")
 
+
 # Display images to ensure they are loaded correctly
 plt.figure(figsize=(10, 5))
 plt.subplot(1, 2, 1)
@@ -62,11 +80,27 @@ plt.title('Image 1')
 plt.savefig("assets/images/loaded_images.png")
 plt.show()
 
+image1_gray_load = images_path / "image1_rz.jpg"
+transform_grayscale(image1_gray_load,images_path)
+
+image1_gray = load_image(images_path / "image1_gray.jpg")
+
+# Display gray image to ensure they are loaded correctly
+plt.figure(figsize=(10, 5))
+plt.subplot(1, 2, 1)
+plt.imshow(image1.permute(1, 2, 0).cpu().numpy())
+plt.title('Image 1')
+plt.subplot(1, 2, 2)
+plt.imshow(image1_gray.permute(1, 2, 0).cpu().numpy())
+plt.title('Image 1-gray')
+plt.savefig("assets/images/gray_transform.png")
+plt.show()
+
 
 
 # Extract features from both images
 feats0 = extractor.extract(image0.to(device))
-feats1 = extractor.extract(image1.to(device))
+feats1 = extractor.extract(image1_gray.to(device))
 matches01 = matcher({"image0": feats0, "image1": feats1})
 feats0, feats1, matches01 = [rbd(x) for x in [feats0, feats1, matches01]]
 
@@ -78,10 +112,10 @@ m_kpts0, m_kpts1 = kpts0[matches[..., 0]], kpts1[matches[..., 1]]
 print(f'Number of matches: {matches.shape[0]}')
 
 #Visualize the matches
-axes = viz2d.plot_images([image0, image1])
+axes = viz2d.plot_images([image0, image1_gray])
 viz2d.plot_matches(m_kpts0, m_kpts1, color="lime", lw=0.2)
 viz2d.add_text(0, f'Stop after {matches01["stop"]} layers', fs=20)
-plt.savefig("assets/images/matched_keypoints.png")
+plt.savefig("assets/images/matched_keypoints_gray.png")
 
 # # Visualize keypoints
 # kpc0, kpc1 = viz2d.cm_prune(matches01["prune0"]), viz2d.cm_prune(matches01["prune1"])
@@ -143,23 +177,6 @@ blended_image = cv2.addWeighted(warped_img0, alpha, image1_np, 1 - alpha, 0)
 # Display the blended image
 
 cv2.imshow('Blended Image', blended_image)
-cv2.imwrite('assets/images/image_fusion.png', 255*blended_image)
+cv2.imwrite('assets/images/image_fusion_gray.png', 255*blended_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-
-
-# # Create a canvas to hold both images
-# canvas = np.zeros((y_max - y_min, x_max - x_min, 3), dtype=np.uint8)
-
-# # Place image 1 on the canvas
-# canvas[translation_dist[1]:height1 + translation_dist[1], translation_dist[0]:width1 + translation_dist[0]] = image1_np
-
-# # Overlay the warped image 0 on the canvas
-# mask_warped_img0 = (warped_img0 > 0)
-# canvas[mask_warped_img0] = warped_img0[mask_warped_img0]
-
-# # Display the final stitched image
-# plt.figure(figsize=(15, 10))
-# plt.imshow(canvas)
-# plt.title('Warped Image 0 to the Perspective of Image 1')
-# plt.show()
