@@ -17,6 +17,7 @@ def resize_to_smaller(image1_path, image2_path, output_path):
     - image2_path: Path to the second image file.
     - output_path: Path to save the resized images.
     """
+    # The use of Pillow for this function is to keep the image as a jpg
     image1 = Image.open(image1_path)
     image2 = Image.open(image2_path)
 
@@ -48,20 +49,21 @@ image1_load = images_path / "VIS_3.jpg"
 
 resize_to_smaller(image0_load, image1_load, images_path)
 
+# Transform image into a PyTorch Tensor, for LightGlue Neural Network
 image0 = load_image(images_path / "image0_rz.jpg")
 image1 = load_image(images_path / "image1_rz.jpg")
 
 # Display images to ensure they are loaded correctly
 plt.figure(figsize=(10, 5))
 plt.subplot(1, 2, 1)
-plt.imshow(image0.permute(1, 2, 0).cpu().numpy())
+# Adjust the dimensions from C,H,W to H,W,C
+plt.imshow(image0.permute(1, 2, 0).cpu().numpy())  
 plt.title('Image 0')
 plt.subplot(1, 2, 2)
 plt.imshow(image1.permute(1, 2, 0).cpu().numpy())
 plt.title('Image 1')
 plt.savefig("assets/images/loaded_images.png")
 plt.show()
-
 
 
 # Extract features from both images
@@ -83,10 +85,10 @@ viz2d.plot_matches(m_kpts0, m_kpts1, color="lime", lw=0.2)
 viz2d.add_text(0, f'Stop after {matches01["stop"]} layers', fs=20)
 plt.savefig("assets/images/matched_keypoints.png")
 
-# # Visualize keypoints
-# kpc0, kpc1 = viz2d.cm_prune(matches01["prune0"]), viz2d.cm_prune(matches01["prune1"])
-# viz2d.plot_images([image0, image1])
-# viz2d.plot_keypoints([kpts0, kpts1], colors=[kpc0, kpc1], ps=10)
+# Visualize keypoints
+kpc0, kpc1 = viz2d.cm_prune(matches01["prune0"]), viz2d.cm_prune(matches01["prune1"])
+viz2d.plot_images([image0, image1])
+viz2d.plot_keypoints([kpts0, kpts1], colors=[kpc0, kpc1], ps=10)
 
 #Show images
 plt.show()
