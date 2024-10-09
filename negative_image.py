@@ -157,7 +157,7 @@ plt.savefig("assets/images/matched_keypoints_negative.png")
 
 # Visualize keypoints
 kpc0, kpc1 = viz2d.cm_prune(matches01["prune0"]), viz2d.cm_prune(matches01["prune1"])
-viz2d.plot_images([image0, image1])
+viz2d.plot_images([image0_negative, image1_negative])
 viz2d.plot_keypoints([kpts0, kpts1], colors=[kpc0, kpc1], ps=10)
 
 #Show images
