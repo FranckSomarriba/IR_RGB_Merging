@@ -45,10 +45,10 @@ matcher = LightGlue(features="superpoint").eval().to(device) # Lightglue is set 
 
 
 # Load images for resizing step
-image0_load = images_path / "IR_3.jpg"
-image1_load = images_path / "VIS_3.jpg"
+image0_load = images_path / "sacre_coeur1.jpg"
+image1_load = images_path / "sacre_coeur2.jpg"
 
-resize_to_smaller(image0_load, image1_load, images_path)
+#resize_to_smaller(image0_load, image1_load, images_path)
 
 
 # Transform image into a PyTorch Tensor, for LightGlue Neural Network
@@ -82,8 +82,10 @@ feats0, feats1, matches01 = [rbd(x) for x in [feats0, feats1, matches01]] # Remo
 # Extract keypoints and matches
 kpts0 = feats0["keypoints"]  # Keypoints from the first image
 kpts1 = feats1["keypoints"]  # Keypoints from the second image
+
 matches = matches01["matches"]  # Indices of matched keypoints
 scores = matches01["scores"]  # Confidence scores for each match
+
 
 # Create a boolean mask where scores are greater than 0.9
 good_match_mask = scores > 0.6  # This will be a boolean tensor of shape [N_matches]
